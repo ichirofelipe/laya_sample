@@ -14,7 +14,6 @@ export default class DropBox extends Laya.Script {
     onEnable(): void {
         /**获得组件引用，避免每次获取组件带来不必要的查询开销 */
         this._rig = this.owner.getComponent(Laya.RigidBody);
-        this._rig.setVelocity({ x: 0, y: 10 });
         this.level = Math.round(Math.random() * 5) + 1;
         this._text = this.owner.getChildByName("levelTxt") as Laya.Text;
         this._text.text = this.level + "";
@@ -28,7 +27,6 @@ export default class DropBox extends Laya.Script {
     onTriggerEnter(other: any, self: any, contact: any): void {
         var owner: Laya.Sprite = this.owner as Laya.Sprite;
         
-        console.log(other);
         if (other.label === "buttle") {
             //碰撞到子弹后，增加积分，播放声音特效
             if (this.level > 1) {
@@ -50,10 +48,43 @@ export default class DropBox extends Laya.Script {
         } else if (other.label === "ground") {
             //只要有一个盒子碰到地板，则停止游戏
             // owner.removeSelf();
-            owner.getComponent(Laya.RigidBody).setVelocity({ x: 0, y: -10 });
+            var velX = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.x;
+            var velY = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
+
+            velY = (velY - 100) * 0.2;
+
+            owner.getComponent(Laya.RigidBody).setVelocity({ x: velX, y: velY*0.5 });
             // GameUI.instance.stopGame();
         } else if (other.label === "levelCollission") {
-            console.log("WOW");
+            var diff = 0;
+            var diffX = (owner.x - other.rigidBody.owner.x);
+            var diffY = (owner.y - other.rigidBody.owner.y);
+
+            if(diffX < 0){
+                diffX += 100;
+            } else {
+                diffX -= 100;
+            }
+
+            diff = (diffX - diffY);
+
+            
+
+            var velY = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
+            owner.getComponent(Laya.RigidBody).setVelocity({x: diff/4, y: 0});
+            // console.log("OTHER BLOCK X",other.rigidBody.owner.x);
+            // console.log("DIFFERENCE",diff);
+            // console.log("Y - Velocity",velY);
+            // console.log("NEW X VELOCITY", diff+velY);
+        } else if(other.label === "wall") {
+            if(owner.y > other.rigidBody.owner.y)
+                return;
+            var velX = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.x;
+            var vely = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
+            console.log(velX);
+            velX = -((velX - 100) * 0.2);
+            console.log(velX);
+            owner.getComponent(Laya.RigidBody).setVelocity({ x: velX, y: vely });
         }
     }
 
