@@ -56,35 +56,48 @@ export default class DropBox extends Laya.Script {
             owner.getComponent(Laya.RigidBody).setVelocity({ x: velX, y: velY*0.5 });
             // GameUI.instance.stopGame();
         } else if (other.label === "levelCollission") {
-            var diff = 0;
+            var ownerMass = owner.getComponent(Laya.RigidBody)._body.m_mass;
+            var otherMass = other.rigidBody._body.m_mass;
+            var ownerVelY = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
+            var otherVelY = other.rigidBody._body.m_linearVelocity.y;
+            
+            var finalVelY = ((ownerMass*ownerVelY) + (otherMass*otherVelY))/(ownerMass+otherMass)
+
             var diffX = (owner.x - other.rigidBody.owner.x);
-            var diffY = (owner.y - other.rigidBody.owner.y);
 
-            if(diffX < 0){
-                diffX += 100;
-            } else {
-                diffX -= 100;
-            }
-
-            diff = (diffX - diffY);
+            if(diffX < 0)
+                finalVelY *= -1;
 
             
-
-            var velY = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
-            owner.getComponent(Laya.RigidBody).setVelocity({x: diff/4, y: 0});
-            // console.log("OTHER BLOCK X",other.rigidBody.owner.x);
-            // console.log("DIFFERENCE",diff);
-            // console.log("Y - Velocity",velY);
-            // console.log("NEW X VELOCITY", diff+velY);
-        } else if(other.label === "wall") {
-            if(owner.y > other.rigidBody.owner.y)
-                return;
+            owner.getComponent(Laya.RigidBody).setVelocity({x: finalVelY, y: 0});
+            
+        } else if(other.label === "wall-left" || other.label === "wall-right") {
+            console.log("wall");
             var velX = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.x;
             var vely = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
-            console.log(velX);
-            velX = -((velX - 100) * 0.2);
-            console.log(velX);
+            velX *= -1
             owner.getComponent(Laya.RigidBody).setVelocity({ x: velX, y: vely });
+        }
+    }
+
+    onTriggerStay(other: any, self: any, contact: any): void {
+        var owner: Laya.Sprite = this.owner as Laya.Sprite;
+
+        if (other.label === "levelCollission") {
+            var ownerMass = owner.getComponent(Laya.RigidBody)._body.m_mass;
+            var otherMass = other.rigidBody._body.m_mass;
+            var ownerVelY = owner.getComponent(Laya.RigidBody)._body.m_linearVelocity.y;
+            var otherVelY = other.rigidBody._body.m_linearVelocity.y;
+            
+            var finalVelY = ((ownerMass*ownerVelY) + (otherMass*otherVelY))/(ownerMass+otherMass)
+
+            var diffX = (owner.x - other.rigidBody.owner.x);
+
+            if(diffX < 0)
+                finalVelY *= -1;
+            
+
+            owner.getComponent(Laya.RigidBody).setVelocity({x: finalVelY, y: 0});
         }
     }
 
