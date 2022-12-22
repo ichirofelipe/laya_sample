@@ -23,28 +23,20 @@ export default class GameUI extends ui.test.TestSceneUI {
     onEnable(): void {
         this._control = this.getComponent(GameControl);
         //点击提示文字，开始游戏
-        this.tipLbll.on(Laya.Event.CLICK, this, this.onTipClick);
+        // this.tipLbll.on(Laya.Event.CLICK, this, this.onTipClick);
     }
 
     onTipClick(e: Laya.Event): void {
-        this.tipLbll.visible = false;
-        this._score = 0;
-        this.scoreLbl.text = "";
+        // this.tipLbll.visible = false;
+        // this._score = 0;
+        // this.scoreLbl.text = "";
         this._control.startGame();
-    }
-
-    /**增加分数 */
-    addScore(value: number = 1): void {
-        this._score += value;
-        this.scoreLbl.changeText("分数：" + this._score);
-        //随着分数越高，难度增大
-        if (this._control.createBoxInterval > 600 && this._score % 20 == 0) this._control.createBoxInterval -= 20;
     }
 
     /**停止游戏 */
     stopGame(): void {
-        this.tipLbll.visible = true;
-        this.tipLbll.text = "游戏结束了，点击屏幕重新开始";
+        // this.tipLbll.visible = true;
+        // this.tipLbll.text = "游戏结束了，点击屏幕重新开始";
         this._control.stopGame();
     }
 }
